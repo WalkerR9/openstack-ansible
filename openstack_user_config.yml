@@ -1,0 +1,89 @@
+---
+cidr_networks:
+  container: 172.29.236.0/22
+  tunnel: 172.29.240.0/22
+  storage: 172.29.244.0/22
+
+global_overrides:
+  internal_lb_vip_address: "172.29.236.11"
+  external_lb_vip_address: "192.168.122.11"
+  management_bridge: "br-mgmt"
+
+  provider_networks:
+    - network:
+        container_bridge: "br-mgmt"
+        container_type: "veth"
+        container_interface: "eth1"
+        ip_from_q: "container"
+        type: "raw"
+        is_management_address: true
+        group_binds:
+          - all_containers
+          - hosts
+
+    - network:
+        container_bridge: "br-vxlan"
+        container_type: "veth"
+        container_interface: "eth10"
+        ip_from_q: "tunnel"
+        type: "vxlan"
+        range: "1:1000"
+        group_binds:
+          - neutron_linuxbridge_agent
+
+    - network:
+        container_bridge: "br-storage"
+        container_type: "veth"
+        container_interface: "eth2"
+        ip_from_q: "storage"
+        type: "raw"
+        group_binds:
+          - cinder_volume
+          - glance_api
+          - nova_compute
+
+    - network:
+        group_binds:
+          - neutron_linuxbridge_agent
+        container_bridge: "br-vlan"
+        container_type: "veth"
+        container_interface: "eth12"
+        host_bind_override: "enp12s0"
+        type: "flat"
+        net_name: "flat"
+
+shared-infra_hosts:
+  infra1:
+    ip: 172.29.236.11
+
+repo-infra_hosts:
+  infra1:
+    ip: 172.29.236.11
+
+os-infra_hosts:
+  infra1:
+    ip: 172.29.236.11
+
+identity_hosts:
+  infra1:
+    ip: 172.29.236.11
+
+network_hosts:
+  infra1:
+    ip: 172.29.236.11
+
+compute_hosts:
+  compute1:
+    ip: 172.29.236.21
+
+storage-infra_hosts:
+  infra1:
+    ip: 172.29.236.11
+
+storage_hosts:
+  infra1:
+    ip: 172.29.236.11
+
+load_balancer_hosts:
+  infra1:
+    ip: 172.29.236.11
